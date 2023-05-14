@@ -1,8 +1,8 @@
 {
   "name": "Calc",
   "short_name": "Calc",
-  "scope":"/calc",
-  "start_url": "/calc",
+  "scope":"/calc/",
+  "start_url": "/calc/",
   "display": "standalone",
   "background_color": "#fff",
   "description": "Calc",
