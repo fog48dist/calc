@@ -6,111 +6,82 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Calc</title>
     <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="https://raw.githack.com/fog48dist/fog48dist.github.io/main/1.css" />
     <style>
-      html,
       body {
-        min-height: 100%;
-      }
-      html,
-      body {
-        padding: 0;
-        margin: 0;
-        background-color: hsl(0, 0%, 80%);
-      }
-      html {
-        height: 100%;
-      }
-      body {
-        min-height: 100%;
-      }
-      .wrapper {
-        display: grid;
+        /* display: grid; */
         grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        --margin-size: 12px;
-        margin: var(--margin-size);
         font: 30px Arial, sans-serif;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        height: calc(100% - 2 * var(--margin-size));
-        width: calc(100% - 2 * var(--margin-size));
-      }
-      .wrapper > div {
-        background-color: white;
-        border: none;
       }
       .button,
       .button2 {
         text-align: center;
+        user-select: none;
       }
       .field {
         grid-column: 1 / 5;
         overflow-wrap: anywhere;
-        font: 30px Arial, sans-serif;
-        border: none;
+        font: inherit;
         outline: none;
         resize: none;
       }
     </style>
   </head>
-  <body>
-    <div class="wrapper" id="mainWrapper">
-      <textarea
-        class="field"
-        id="input"
-        autofocus
-        inputmode="none"
-        rows="4"
-      ></textarea>
-      <div class="field" id="resultField">&nbsp</div>
-      <div class="button">sin(</div>
-      <div class="button">cos(</div>
-      <div class="button">tan(</div>
-      <div class="button">cot(</div>
-      <div class="button">a</div>
-      <div class="button">log(</div>
-      <div class="button">abs(</div>
-      <div class="button">deg</div>
-      <div class="button">7</div>
-      <div class="button">8</div>
-      <div class="button">9</div>
-      <div class="button">*</div>
-      <div class="button">4</div>
-      <div class="button">5</div>
-      <div class="button">6</div>
-      <div class="button">/</div>
-      <div class="button">1</div>
-      <div class="button">2</div>
-      <div class="button">3</div>
-      <div class="button">+</div>
-      <div class="button">0</div>
-      <div class="button">.</div>
-      <div class="button">,</div>
-      <div class="button">-</div>
-      <div class="button">(</div>
-      <div class="button">)</div>
-      <div class="button">[</div>
-      <div class="button">]</div>
-      <div class="button">π</div>
-      <div class="button2" id="clearAll">AC</div>
-      <div class="button2" id="clearOneChar">C</div>
-      <div class="button">hypot(</div>
-      <div
-        class="button"
-        style="
-          background-image: url(gear-svgrepo-com.svg);
-          background-size: contain;
-          background-repeat: no-repeat;
-          background-position: center;
-          width: 100%;
-          height: 100%;
-        "
-      >
-        &nbsp
-      </div>
-      <div class="button">e</div>
+  <body class="appPage" class="wrapper" id="mainWrapper">
+    <textarea
+      class="field"
+      id="input"
+      autofocus
+      inputmode="none"
+      rows="4"
+    ></textarea>
+    <div class="field" id="resultField">&nbsp</div>
+    <div class="button">sin(</div>
+    <div class="button">cos(</div>
+    <div class="button">tan(</div>
+    <div class="button">cot(</div>
+    <div class="button">a</div>
+    <div class="button">log(</div>
+    <div class="button">abs(</div>
+    <div class="button">deg</div>
+    <div class="button">7</div>
+    <div class="button">8</div>
+    <div class="button">9</div>
+    <div class="button">*</div>
+    <div class="button">4</div>
+    <div class="button">5</div>
+    <div class="button">6</div>
+    <div class="button">/</div>
+    <div class="button">1</div>
+    <div class="button">2</div>
+    <div class="button">3</div>
+    <div class="button">+</div>
+    <div class="button">0</div>
+    <div class="button">.</div>
+    <div class="button">,</div>
+    <div class="button">-</div>
+    <div class="button">(</div>
+    <div class="button">)</div>
+    <div class="button">[</div>
+    <div class="button">]</div>
+    <div class="button">π</div>
+    <div class="button2" id="clearAll">AC</div>
+    <div class="button2" id="clearOneChar">C</div>
+    <div class="button">hypot(</div>
+    <div
+      class="button"
+      style="
+        background-image: url(gear-svgrepo-com.svg);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 100%;
+        height: 100%;
+      "
+    >
+      &nbsp
     </div>
+    <div class="button">e</div>
     <script src="math.js"></script>
     <script>
       input.blur();
@@ -136,7 +107,7 @@
         try {
           input.value = input.value.replaceAll("**", "^");
           const result = parser.evaluate(input.value);
-          console.log(math.typeOf(result));
+          // console.log(math.typeOf(result));
           resultField.innerHTML =
             math.typeOf(result) != "e" ? math.round(result, 8) : result;
         } catch (error) {
@@ -162,7 +133,7 @@
         input.value =
           input.value.slice(0, input.selectionStart - 1) +
           input.value.slice(input.selectionEnd);
-        input.selectionEnd = input.selectionStart = cursorPos-1;
+        input.selectionEnd = input.selectionStart = cursorPos - 1;
         evaluate();
       });
       clearAll.addEventListener("click", (e) => {
