@@ -63,7 +63,7 @@
         inputmode="none"
         rows="4"
       ></textarea>
-      <div class="field" id="resultField">&nbsp</div>
+      <div class="field" id="resultField">&nbsp TEST</div>
       <div class="button">sin(</div>
       <div class="button">cos(</div>
       <div class="button">tan(</div>
@@ -158,9 +158,11 @@
         });
       }
       clearOneChar.addEventListener("click", (e) => {
+        const cursorPos = input.selectionStart;
         input.value =
           input.value.slice(0, input.selectionStart - 1) +
           input.value.slice(input.selectionEnd);
+        input.selectionEnd = input.selectionStart = cursorPos;
         evaluate();
       });
       clearAll.addEventListener("click", (e) => {
