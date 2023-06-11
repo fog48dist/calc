@@ -69,15 +69,9 @@
     <div class="button2" id="clearOneChar">C</div>
     <div class="button">hypot(</div>
     <div
-      class="button"
-      style="
-        background-image: url(gear-svgrepo-com.svg);
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 100%;
-        height: 100%;
-      "
+      class="button settingsButton"
+
+>
     >
       &nbsp
     </div>
@@ -95,7 +89,6 @@
         }
       }
       const addDiv = addElement.bind(globalThis, "div", mainWrapper);
-      //ddtaxErrnd
       math.config({
         number: "BigNumber",
         epsilon: 1e-12,
@@ -107,7 +100,6 @@
         try {
           input.value = input.value.replaceAll("**", "^");
           const result = parser.evaluate(input.value);
-          // console.log(math.typeOf(result));
           resultField.innerHTML =
             math.typeOf(result) != "e" ? math.round(result, 8) : result;
         } catch (error) {
