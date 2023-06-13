@@ -13,13 +13,15 @@
     <style>
       .appPage {
         grid-template-columns: repeat(4, 1fr);
-        font: 30px Arial, sans-serif;
+        font: 4.5vh Arial, sans-serif;
+        /* container-type: inline-size;
+        container-name: appPage; */
       }
       .button,
       .button2 {
         text-align: center;
         user-select: none;
-        line-height: 28px;
+        /* line-height: 15px; */
       }
       .field {
         grid-column: 1 / 5;
@@ -28,53 +30,65 @@
         outline: none;
         resize: none;
       }
+      @media (min-aspect-ratio: 4/5) {
+        .appPage {
+          font-size: 6vh;
+          height: calc(100% - 2 * var(--padding-size));
+        }
+        #input {
+          height: 2em;
+        }
+        .button0 {
+          display: none;
+        }
+      }
     </style>
   </head>
   <body>
-      <div class="appPage" id="mainWrapper">
-        <textarea
-          class="field"
-          id="input"
-          autofocus
-          inputmode="none"
-          rows="4"
-        ></textarea>
-        <div class="field" id="resultField">&nbsp</div>
-        <div class="button">sin(</div>
-        <div class="button">cos(</div>
-        <div class="button">tan(</div>
-        <div class="button">cot(</div>
-        <div class="button">a</div>
-        <div class="button">log(</div>
-        <div class="button">abs(</div>
-        <div class="button">deg</div>
-        <div class="button">7</div>
-        <div class="button">8</div>
-        <div class="button">9</div>
-        <div class="button">*</div>
-        <div class="button">4</div>
-        <div class="button">5</div>
-        <div class="button">6</div>
-        <div class="button">/</div>
-        <div class="button">1</div>
-        <div class="button">2</div>
-        <div class="button">3</div>
-        <div class="button">+</div>
-        <div class="button">0</div>
-        <div class="button">.</div>
-        <div class="button">,</div>
-        <div class="button">-</div>
-        <div class="button">(</div>
-        <div class="button">)</div>
-        <div class="button">[</div>
-        <div class="button">]</div>
-        <div class="button">π</div>
-        <div class="button2" id="clearAll">AC</div>
-        <div class="button2" id="clearOneChar">C</div>
-        <div class="button">hypot(</div>
-        <div class="button2 settingsButton"> &nbsp</div>
-        <div class="button">e</div>
-      </div>
+    <div class="appPage" id="mainWrapper">
+      <textarea
+        class="field"
+        id="input"
+        autofocus
+        inputmode="none"
+        rows="4"
+      ></textarea>
+      <div class="field" id="resultField">&nbsp</div>
+      <div class="button">sin(</div>
+      <div class="button">cos(</div>
+      <div class="button">tan(</div>
+      <div class="button">cot(</div>
+      <div class="button">a</div>
+      <div class="button">log(</div>
+      <div class="button">abs(</div>
+      <div class="button">deg</div>
+      <div class="button">7</div>
+      <div class="button">8</div>
+      <div class="button">9</div>
+      <div class="button">*</div>
+      <div class="button">4</div>
+      <div class="button">5</div>
+      <div class="button">6</div>
+      <div class="button">/</div>
+      <div class="button">1</div>
+      <div class="button">2</div>
+      <div class="button">3</div>
+      <div class="button">+</div>
+      <div class="button">0</div>
+      <div class="button">.</div>
+      <div class="button">π</div>
+      <div class="button">-</div>
+      <div class="button button0">(</div>
+      <div class="button button0">)</div>
+      <div class="button button0">[</div>
+      <div class="button button0">]</div>
+      <div class="button button0">,</div>
+      <div class="button button0">hypot(</div>
+      <div class="settingsButton button0">&nbsp</div>
+      <div class="button button0">e</div>
+      <div class="button2" id="clearAll">AC</div>
+      <div class="button2" id="clearOneChar">C</div>
+    </div>
     <script src="math.js"></script>
     <script>
       input.blur();
