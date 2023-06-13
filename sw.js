@@ -7,7 +7,7 @@ var assets = [
   `${repoPath}/gear-svgrepo-com.svg`,
 ]
 
-const cacheName ="calc_cache_005"
+const cacheName ="calc_cache_006"
 
 self.addEventListener("install", installEvent => {
   installEvent.waitUntil(
