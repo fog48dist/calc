@@ -27,15 +27,13 @@
         outline: none;
         resize: none;
       }
+
       @media (min-aspect-ratio: 4/5) {
         .appPage {
-          gap:5px;
-          font-size: 6vh;
+          gap: 5px;
+          font-size: 5vh;
           height: calc(100% - 2 * var(--padding-size));
-          --padding-size:8px;
-        }
-        #input {
-          height: 2em;
+          --padding-size: 8px;
         }
         .button0 {
           display: none;
@@ -50,17 +48,18 @@
         id="input"
         autofocus
         inputmode="none"
-        rows="4"
+        rows="3"
+        onchange="console.log('change')"
       ></textarea>
       <div class="field" id="resultField">&nbsp</div>
-      <div class="button">sin(</div>
-      <div class="button">cos(</div>
-      <div class="button">tan(</div>
-      <div class="button">cot(</div>
-      <div class="button">a</div>
-      <div class="button">log(</div>
-      <div class="button">abs(</div>
-      <div class="button">deg</div>
+      <div class="button button0">sin(</div>
+      <div class="button button0">cos(</div>
+      <div class="button button0">tan(</div>
+      <div class="button button0">cot(</div>
+      <div class="button button0">a</div>
+      <div class="button button0">log(</div>
+      <div class="button button0">abs(</div>
+      <div class="button button0">deg</div>
       <div class="button">7</div>
       <div class="button">8</div>
       <div class="button">9</div>
@@ -77,8 +76,8 @@
       <div class="button">.</div>
       <div class="button">π</div>
       <div class="button">-</div>
-      <div class="button button0">(</div>
-      <div class="button button0">)</div>
+      <div class="button">(</div>
+      <div class="button">)</div>
       <div class="button button0">[</div>
       <div class="button button0">]</div>
       <div class="button button0">,</div>
@@ -87,20 +86,11 @@
       <div class="button button0">e</div>
       <div class="button2" id="clearAll">AC</div>
       <div class="button2" id="clearOneChar">C</div>
+      <div class="button2" id="cursorMoveLeft"><-</div>
+      <div class="button2" id="cursorMoveRight">-></div>
     </div>
     <script src="math.js"></script>
     <script>
-      input.blur();
-      function addElement(tag, parent, str, classes, func) {
-        const element = document.createElement(tag);
-        if (element) {
-          if (str) element.innerHTML = str;
-          if (classes) element.classList.add(...classes);
-          if (func) element.addEventListener("click", func);
-          parent.appendChild(element);
-        }
-      }
-      const addDiv = addElement.bind(globalThis, "div", mainWrapper);
       math.config({
         number: "BigNumber",
         epsilon: 1e-12,
@@ -110,15 +100,16 @@
       parser.evaluate("π=pi");
       function evaluate() {
         try {
-          input.value = input.value.replaceAll("**", "^");
+          input.value = input.value
+            .replaceAll("//", "%")
+            .replaceAll("**", "^")
+            .replaceAll("..", "e");
           const result = parser.evaluate(input.value);
           resultField.innerHTML =
             math.typeOf(result) != "e" ? math.round(result, 8) : result;
         } catch (error) {
-          console.log(error.name);
           console.log(error);
         }
-        input.focus();
       }
       for (const button of document.getElementsByClassName("button")) {
         button.addEventListener("click", (e) => {
@@ -133,29 +124,26 @@
         });
       }
       clearOneChar.addEventListener("click", (e) => {
-        const cursorPos = input.selectionStart;
-        input.value =
-          input.value.slice(0, input.selectionStart - 1) +
-          input.value.slice(input.selectionEnd);
-        input.selectionEnd = input.selectionStart = cursorPos - 1;
-        evaluate();
+        if (input.selectionEnd > 0) {
+          const cursorPos = input.selectionStart-1;
+          input.value =
+            input.value.slice(0, cursorPos) +
+            input.value.slice(input.selectionEnd);
+          input.selectionEnd = input.selectionStart = cursorPos ;
+          evaluate();
+        }
       });
       clearAll.addEventListener("click", (e) => {
-        input.value = "";
-        evaluate();
+        resultField.innerHTML = input.value = "";
+      });
+      cursorMoveLeft.addEventListener("click", (e) => {
+        input.selectionStart = --input.selectionEnd;
+      });
+      cursorMoveRight.addEventListener("click", (e) => {
+        input.selectionStart = ++input.selectionEnd;
       });
       input.addEventListener("input", evaluate);
-      addDiv("<-", ["button"], (e) => {
-        input.focus({ focusVisible: true });
-        input.selectionStart--;
-        input.selectionEnd--;
-      });
-      addDiv("->", ["button"], (e) => {
-        input.focus({ focusVisible: true });
-        input.selectionStart++;
-        input.selectionEnd++;
-      });
-      // input.focus()
+      input.addEventListener("blur", (e) => setTimeout(input.focus(), 20));
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", function () {
           navigator.serviceWorker
