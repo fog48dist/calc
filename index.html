@@ -98,15 +98,29 @@
       });
       const parser = math.parser();
       parser.evaluate("π=pi");
+      parser.evaluate("Σ=sum");
+      parser.evaluate("Π=prod");
       function evaluate() {
         try {
-          input.value = input.value
-            .replaceAll("//", "%")
-            .replaceAll("**", "^")
-            .replaceAll("..", "e");
+          const cursorPos = input.selectionStart;
+          let count = 0;
+          for (const [k, v] of Object.entries({
+            "**": "^",
+            "//": "%",
+            "..": ",",
+            ",.": "e",
+            "+++": "Σ",
+            "ππ": "Π",
+          })) {
+            input.value = input.value.replaceAll(k, (x, o) => {
+              if (o < cursorPos) count++;
+              return v;
+            });
+          }
+          input.selectionStart = input.selectionEnd = cursorPos - count;
           const result = parser.evaluate(input.value);
           resultField.innerHTML =
-            math.typeOf(result) != "e" ? math.round(result, 8) : result;
+            math.typeOf(result) == "e" ? result : math.format(result,{precision:8});
         } catch (error) {
           console.log(error);
         }
@@ -125,11 +139,11 @@
       }
       clearOneChar.addEventListener("click", (e) => {
         if (input.selectionEnd > 0) {
-          const cursorPos = input.selectionStart-1;
+          const cursorPos = input.selectionStart - 1;
           input.value =
             input.value.slice(0, cursorPos) +
             input.value.slice(input.selectionEnd);
-          input.selectionEnd = input.selectionStart = cursorPos ;
+          input.selectionEnd = input.selectionStart = cursorPos;
           evaluate();
         }
       });
