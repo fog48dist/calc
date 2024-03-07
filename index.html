@@ -1,171 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Calc</title>
-    <link rel="manifest" href="manifest.json" />
-    <link
-      rel="stylesheet"
-      href="https://raw.githack.com/fog48dist/fog48dist.github.io/main/1.css"
-    />
-    <style>
+
+<head>
+  <title>Calc</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    html,
+    body {
+      height: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    .appPage {
+      gap: 1.5vmin;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template: auto auto repeat(8, 1fr)/repeat(4, 1fr);
+      font: 4vmax Arial, sans-serif;
+      touch-action: manipulation;
+      background-color: hsl(0, 0%, 90%);
+    }
+
+    .appPage>* {
+      background-color: white;
+    }
+
+    #settingsButton {
+      background-image: url(gear-svgrepo-com.svg);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .button,
+    .button2 {
+      text-align: center;
+      user-select: none;
+      align-items: center;
+    }
+
+    .field {
+      padding: 0.15ch;
+      grid-column: 1 / span 4;
+      overflow-wrap: anywhere;
+      font: inherit;
+    }
+
+    #input {
+      line-height: 1em;
+      height: 3em;
+      outline: none;
+      border: none;
+      resize: none;
+    }
+
+    #resultField {
+      text-align: right;
+      height: 1em;
+    }
+
+    @media (min-aspect-ratio: 1.4) {
       .appPage {
-        grid-template-columns: repeat(4, 1fr);
-        font: 4.5vh Arial, sans-serif;
+        --ncols: 8;
+        grid-template: auto auto repeat(4, 1fr)/repeat(var(--ncols), 1fr);
+        grid-auto-flow: column revert;
       }
-      .button,
-      .button2 {
-        text-align: center;
-        user-select: none;
+      #input{
+        height: 2em;
       }
       .field {
-        grid-column: 1 / 5;
-        overflow-wrap: anywhere;
-        font: inherit;
-        outline: none;
-        resize: none;
+        grid-column: 1 / span var(--ncols);
       }
 
-      @media (min-aspect-ratio: 4/5) {
-        .appPage {
-          gap: 5px;
-          font-size: 5vh;
-          height: calc(100% - 2 * var(--padding-size));
-          --padding-size: 8px;
-        }
-        .button0 {
-          display: none;
-        }
+      .button0 {
+        display: none;
       }
-    </style>
-  </head>
-  <body>
-    <div class="appPage" id="mainWrapper">
-      <textarea
-        class="field"
-        id="input"
-        autofocus
-        inputmode="none"
-        rows="3"
-        onchange="console.log('change')"
-      ></textarea>
-      <div class="field" id="resultField">&nbsp</div>
-      <div class="button button0">sin(</div>
-      <div class="button button0">cos(</div>
-      <div class="button button0">tan(</div>
-      <div class="button button0">cot(</div>
-      <div class="button button0">a</div>
-      <div class="button button0">log(</div>
-      <div class="button button0">abs(</div>
-      <div class="button button0">deg</div>
-      <div class="button">7</div>
-      <div class="button">8</div>
-      <div class="button">9</div>
-      <div class="button">*</div>
-      <div class="button">4</div>
-      <div class="button">5</div>
-      <div class="button">6</div>
-      <div class="button">/</div>
-      <div class="button">1</div>
-      <div class="button">2</div>
-      <div class="button">3</div>
-      <div class="button">+</div>
-      <div class="button">0</div>
-      <div class="button">.</div>
-      <div class="button">π</div>
-      <div class="button">-</div>
-      <div class="button">(</div>
-      <div class="button">)</div>
-      <div class="button button0">[</div>
-      <div class="button button0">]</div>
-      <div class="button button0">,</div>
-      <div class="button button0">hypot(</div>
-      <div class="settingsButton button0">&nbsp</div>
-      <div class="button button0">e</div>
-      <div class="button2" id="clearAll">AC</div>
-      <div class="button2" id="clearOneChar">C</div>
-      <div class="button2 button0" id="cursorMoveLeft"><-</div>
-      <div class="button2 button0" id="cursorMoveRight">-></div>
-    </div>
-    <script src="math.js"></script>
-    <script>
-      math.config({
-        number: "BigNumber",
-        epsilon: 1e-12,
-        precision: 80,
-      });
-      const parser = math.parser();
-      parser.evaluate("π=pi");
-      parser.evaluate("Σ=sum");
-      parser.evaluate("Π=prod");
-      function evaluate() {
-        try {
-          const cursorPos = input.selectionStart;
-          let count = 0;
-          for (const [k, v] of Object.entries({
-            "**": "^",
-            "//": "%",
-            "..": ",",
-            ",.": "e",
-            "+++": "Σ",
-            "ππ": "Π",
-          })) {
-            input.value = input.value.replaceAll(k, (x, o) => {
-              if (o < cursorPos) count++;
-              return v;
-            });
-          }
-          input.selectionStart = input.selectionEnd = cursorPos - count;
-          const result = parser.evaluate(input.value);
-          resultField.innerHTML =
-            math.typeOf(result) == "e" ? result : math.format(result,{precision:8});
-        } catch (error) {
-          console.log(error);
-        }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .appPage>* {
+        background-color: hsl(0, 0%, 10%);
+        color: hsl(0, 0%, 90%);
       }
-      for (const button of document.getElementsByClassName("button")) {
-        button.addEventListener("click", (e) => {
-          const cursorPos = input.selectionStart;
-          input.value =
-            input.value.slice(0, input.selectionStart) +
-            e.target.innerHTML +
-            input.value.slice(input.selectionEnd);
-          input.selectionEnd = input.selectionStart =
-            cursorPos + e.target.innerHTML.length;
-          evaluate();
+
+      .appPage {
+        background-color: hsl(0, 0%, 20%);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="appPage" id="mainWrapper">
+    <textarea class="field" id="input" autofocus inputmode="none"></textarea>
+    <div class="field" id="resultField">&nbsp</div>
+    <div class="button">sin(</div>
+    <div class="button">cos(</div>
+    <div class="button">tan(</div>
+    <div class="button">cot(</div>
+    <div class="button">a</div>
+    <div class="button">log(</div>
+    <div class="button">abs(</div>
+    <div class="button">e</div>
+    <div class="button">7</div>
+    <div class="button">8</div>
+    <div class="button">9</div>
+    <div class="button">*</div>
+    <div class="button">4</div>
+    <div class="button">5</div>
+    <div class="button">6</div>
+    <div class="button">/</div>
+    <div class="button">1</div>
+    <div class="button">2</div>
+    <div class="button">3</div>
+    <div class="button">+</div>
+    <div class="button">0</div>
+    <div class="button">.</div>
+    <div class="button">π</div>
+    <div class="button">-</div>
+    <div class="button">(</div>
+    <div class="button2" id="closingbracketButton">)</div>
+    <div class="button2 button0" id="enterButton">↵</div>
+    <div class="button0" id="settingsButton">&nbsp</div>
+    <div class="button2" id="cursorMoveLeft">←</div>
+    <div class="button2" id="cursorMoveRight">→</div>
+    <div class="button2 button0" id="clearOneChar">C</div>
+    <div class="button2 button0" id="clearAll">AC</div>
+  </div>
+  <script src="math.js"></script>
+  <script>
+    input.value = localStorage.getItem('invalue')
+    math.config({
+      number: "BigNumber",
+      epsilon: 1e-12,
+      precision: 80,
+    });
+    const parser = math.parser();
+    parser.evaluate("π=pi;");
+    function bracketbalance(str) {
+      let bal = 0;
+      for (let i = 0; i < str.length; i++) {
+        if (str[i] == '(') bal++
+        else if (str[i] == ')') bal--
+      }
+      return bal;
+    }
+    function evaluate() {
+      let cursorPos = input.selectionStart;
+      for (const [k, v] of Object.entries({
+        "**": "^",
+        "*+": "°",
+        "//": "%",
+        "..": ",",
+      })) {
+        input.value = input.value.replaceAll(k, (x, o) => {
+          if (o < cursorPos) cursorPos--;
+          return v;
         });
       }
-      clearOneChar.addEventListener("click", (e) => {
-        if (input.selectionEnd > 0) {
-          const cursorPos = input.selectionStart - 1;
-          input.value =
-            input.value.slice(0, cursorPos) +
-            input.value.slice(input.selectionEnd);
-          input.selectionEnd = input.selectionStart = cursorPos;
-          evaluate();
-        }
-      });
-      clearAll.addEventListener("click", (e) => {
-        resultField.innerHTML = input.value = "";
-      });
-      cursorMoveLeft.addEventListener("click", (e) => {
-        input.selectionStart = --input.selectionEnd;
-      });
-      cursorMoveRight.addEventListener("click", (e) => {
-        input.selectionStart = ++input.selectionEnd;
-      });
-      input.addEventListener("input", evaluate);
-      input.addEventListener("blur", (e) => setTimeout(input.focus(), 20));
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", function () {
-          navigator.serviceWorker
-            .register("/calc/sw.js", { scope: "/calc/" })
-            .then((res) => console.log("service worker registered"))
-            .catch((err) => console.log("service worker not registered", err));
-        });
+      input.selectionStart = input.selectionEnd = cursorPos;
+      let inputvalue = input.value;
+      for (const [k, v] of Object.entries({
+        "°": "deg",
+        "π": "pi",
+      })) { inputvalue = inputvalue.replaceAll(k, v) }
+      inputvalue += ')'.repeat(bracketbalance(inputvalue))
+      try {
+        const result = math.evaluate(inputvalue);
+        resultField.innerHTML = math.format(result, { precision: 7, lowerExp: -5, upperExp: 7 });
       }
-    </script>
-  </body>
+      catch (error) { console.log(error) }
+    }
+    function insertbuttontext(e) {
+      const cursorPos = input.selectionStart;
+      input.value =
+        input.value.slice(0, input.selectionStart) +
+        e.target.innerText +
+        input.value.slice(input.selectionEnd);
+      input.selectionEnd = input.selectionStart =
+        cursorPos + e.target.innerText.length;
+      evaluate();
+    }
+    for (const button of document.getElementsByClassName("button")) {
+      button.addEventListener("click", insertbuttontext);
+    }
+    closingbracketButton.addEventListener("click", e => {
+      if (bracketbalance(input.value) > 0) insertbuttontext(e);
+    })
+    clearOneChar.addEventListener("click", (e) => {
+      if (input.selectionEnd > 0) {
+        const cursorPos = input.selectionStart - 1;
+        input.value =
+          input.value.slice(0, cursorPos) +
+          input.value.slice(input.selectionEnd);
+        input.selectionEnd = input.selectionStart = cursorPos;
+        evaluate();
+      }
+    });
+    clearAll.addEventListener("click", (e) => {
+      resultField.innerHTML = '&nbsp;';
+      input.value = '';
+    });
+    cursorMoveLeft.addEventListener("click", (e) => {
+      input.selectionStart--;
+      input.selectionEnd--;
+    });
+    cursorMoveRight.addEventListener("click", (e) => {
+      input.selectionEnd++;
+      input.selectionStart++;
+    });
+    enterButton.addEventListener("click", e => {
+      evaluate()
+      localStorage.setItem('invalue', input.value)
+    })
+    input.addEventListener("input", evaluate);
+    input.addEventListener("blur", (e) => setTimeout(input.focus(), 20));
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker
+          .register("/calc/sw.js", { scope: "/calc/" })
+          .then((res) => console.log("service worker registered"))
+          .catch((err) => console.log("service worker not registered", err));
+      });
+    }
+  </script>
+</body>
+
 </html>
