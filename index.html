@@ -63,7 +63,7 @@
       height: 1em;
     }
 
-    @media (min-aspect-ratio: 1.4) {
+    @media (min-aspect-ratio: 4.4) {
       .appPage {
         --ncols: 8;
         grid-template: auto auto repeat(4, 1fr)/repeat(var(--ncols), 1fr);
@@ -122,12 +122,12 @@
     <div class="button">.</div>
     <div class="button">π</div>
     <div class="button">-</div>
-    <div class="button">(</div>
-    <div class="button2" id="closingbracketButton">)</div>
+    <!-- <div class="button">(</div> -->
+    <div class="button2" id="bracketButton">(</div>
     <div class="button2 button0" id="enterButton">↵</div>
-    <div class="button0" id="settingsButton">&nbsp</div>
     <div class="button2" id="cursorMoveLeft">←</div>
     <div class="button2" id="cursorMoveRight">→</div>
+    <div class="button0" id="settingsButton">&nbsp</div>
     <div class="button2 button0" id="clearOneChar">C</div>
     <div class="button2 button0" id="clearAll">AC</div>
   </div>
@@ -150,12 +150,13 @@
       return bal;
     }
     function evaluate() {
+      console.log(input.value)
       let cursorPos = input.selectionStart;
       for (const [k, v] of Object.entries({
         "**": "^",
-        "*+": "°",
+        "++": "°",
         "//": "%",
-        "..": ",",
+        "..": "!",
       })) {
         input.value = input.value.replaceAll(k, (x, o) => {
           if (o < cursorPos) cursorPos--;
@@ -169,11 +170,17 @@
         "π": "pi",
       })) { inputvalue = inputvalue.replaceAll(k, v) }
       inputvalue += ')'.repeat(bracketbalance(inputvalue))
-      try {
-        const result = math.evaluate(inputvalue);
-        resultField.innerHTML = math.format(result, { precision: 7, lowerExp: -5, upperExp: 7 });
+      if('+-*/^%('.includes(input.value.at(-1))){
+        bracketButton.innerText='('
+      }else{
+        bracketButton.innerText=input.value==''?'(':')'
+        try {
+          const result = math.evaluate(inputvalue);
+          const options={ precision: 7, lowerExp: -5, upperExp: 7 }
+          resultField.innerHTML = result?math.format(result, options):'';
+        }
+        catch (error) { console.log(error) }
       }
-      catch (error) { console.log(error) }
     }
     function insertbuttontext(e) {
       const cursorPos = input.selectionStart;
@@ -188,8 +195,8 @@
     for (const button of document.getElementsByClassName("button")) {
       button.addEventListener("click", insertbuttontext);
     }
-    closingbracketButton.addEventListener("click", e => {
-      if (bracketbalance(input.value) > 0) insertbuttontext(e);
+    bracketButton.addEventListener("click", e => {
+      if (bracketButton.innerText=='('||bracketbalance(input.value) > 0) insertbuttontext(e);
     })
     clearOneChar.addEventListener("click", (e) => {
       if (input.selectionEnd > 0) {
@@ -204,6 +211,7 @@
     clearAll.addEventListener("click", (e) => {
       resultField.innerHTML = '&nbsp;';
       input.value = '';
+      evaluate()
     });
     cursorMoveLeft.addEventListener("click", (e) => {
       input.selectionStart--;
