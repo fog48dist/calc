@@ -15,12 +15,12 @@
     }
 
     .appPage {
-      gap: 1.5vmin;
+      gap: min(2vw, 1vh);
       width: 100%;
       height: 100%;
       display: grid;
       grid-template: auto auto repeat(8, 1fr)/repeat(4, 1fr);
-      font: 4vmax Arial, sans-serif;
+      font: min(14vw, 6.7vh) Arial, sans-serif;
       touch-action: manipulation;
       background-color: hsl(0, 0%, 90%);
     }
@@ -41,6 +41,7 @@
       text-align: center;
       user-select: none;
       align-items: center;
+      overflow: hidden;
     }
 
     .field {
@@ -63,24 +64,6 @@
       height: 1em;
     }
 
-    @media (min-aspect-ratio: 4.4) {
-      .appPage {
-        --ncols: 8;
-        grid-template: auto auto repeat(4, 1fr)/repeat(var(--ncols), 1fr);
-        grid-auto-flow: column revert;
-      }
-      #input{
-        height: 2em;
-      }
-      .field {
-        grid-column: 1 / span var(--ncols);
-      }
-
-      .button0 {
-        display: none;
-      }
-    }
-
     @media (prefers-color-scheme: dark) {
       .appPage>* {
         background-color: hsl(0, 0%, 10%);
@@ -98,13 +81,13 @@
   <div class="appPage" id="mainWrapper">
     <textarea class="field" id="input" autofocus inputmode="none"></textarea>
     <div class="field" id="resultField">&nbsp</div>
-    <div class="button">sin(</div>
-    <div class="button">cos(</div>
-    <div class="button">tan(</div>
-    <div class="button">cot(</div>
+    <div class="button">sin</div>
+    <div class="button">cos</div>
+    <div class="button">tan</div>
+    <div class="button">cot</div>
     <div class="button">a</div>
-    <div class="button">log(</div>
-    <div class="button">abs(</div>
+    <div class="button">log</div>
+    <div class="button">abs</div>
     <div class="button">e</div>
     <div class="button">7</div>
     <div class="button">8</div>
@@ -122,14 +105,13 @@
     <div class="button">.</div>
     <div class="button">π</div>
     <div class="button">-</div>
-    <!-- <div class="button">(</div> -->
-    <div class="button2" id="bracketButton">(</div>
-    <div class="button2 button0" id="enterButton">↵</div>
+    <div class="button" id="bracketButton">(</div>
+    <div class="button2 " id="enterButton">↵</div>
     <div class="button2" id="cursorMoveLeft">←</div>
     <div class="button2" id="cursorMoveRight">→</div>
     <div class="button0" id="settingsButton">&nbsp</div>
-    <div class="button2 button0" id="clearOneChar">C</div>
-    <div class="button2 button0" id="clearAll">AC</div>
+    <div class="button2 " id="clearOneChar">C</div>
+    <div class="button2 " id="clearAll">AC</div>
   </div>
   <script src="math.js"></script>
   <script>
@@ -139,8 +121,6 @@
       epsilon: 1e-12,
       precision: 80,
     });
-    const parser = math.parser();
-    parser.evaluate("π=pi;");
     function bracketbalance(str) {
       let bal = 0;
       for (let i = 0; i < str.length; i++) {
@@ -149,82 +129,82 @@
       }
       return bal;
     }
+    function updBraBu() { bracketButton.innerText = '+-*/^%(undefined'.includes(input.value[input.selectionStart - 1]) ? '(' : bracketbalance(input.value) > 0 ? ')' : '' }
     function evaluate() {
-      console.log(input.value)
-      let cursorPos = input.selectionStart;
-      for (const [k, v] of Object.entries({
-        "**": "^",
-        "++": "°",
-        "//": "%",
-        "..": "!",
-      })) {
-        input.value = input.value.replaceAll(k, (x, o) => {
-          if (o < cursorPos) cursorPos--;
-          return v;
-        });
-      }
-      input.selectionStart = input.selectionEnd = cursorPos;
-      let inputvalue = input.value;
-      for (const [k, v] of Object.entries({
-        "°": "deg",
-        "π": "pi",
-      })) { inputvalue = inputvalue.replaceAll(k, v) }
-      inputvalue += ')'.repeat(bracketbalance(inputvalue))
-      if('+-*/^%('.includes(input.value.at(-1))){
-        bracketButton.innerText='('
-      }else{
-        bracketButton.innerText=input.value==''?'(':')'
+      if (input.value) {
+        let cursorPos = input.selectionStart;
+        for (const [k, v] of Object.entries({
+          "**": "^",
+          "++": "°",
+          "//": "%",
+          "..": "!",
+        })) {
+          input.value = input.value.replaceAll(k, (x, o) => {
+            if (o < cursorPos) cursorPos--;
+            return v;
+          });
+        }
+        input.selectionStart = input.selectionEnd = cursorPos;
+        let inputvalue = input.value;
+        for (const [k, v] of Object.entries({
+          "°": "deg",
+          "π": "pi",
+        })) { inputvalue = inputvalue.replaceAll(k, v) };
+        updBraBu()
+        inputvalue = inputvalue.replace(/[*/+\-(]+$/, '')
+        inputvalue += ')'.repeat(bracketbalance(inputvalue))
+        console.log(inputvalue)
         try {
           const result = math.evaluate(inputvalue);
-          const options={ precision: 7, lowerExp: -5, upperExp: 7 }
-          resultField.innerHTML = result?math.format(result, options):'';
+          const options = { precision: 7, lowerExp: -5, upperExp: 7 }
+          resultField.innerHTML = result ? math.format(result, options) : '';
         }
         catch (error) { console.log(error) }
+
       }
     }
     function insertbuttontext(e) {
       const cursorPos = input.selectionStart;
-      input.value =
-        input.value.slice(0, input.selectionStart) +
-        e.target.innerText +
-        input.value.slice(input.selectionEnd);
-      input.selectionEnd = input.selectionStart =
-        cursorPos + e.target.innerText.length;
+      let text = e.target.innerText
+      if (text.length > 2) text += '('
+      input.value = input.value.slice(0, input.selectionStart) + text + input.value.slice(input.selectionEnd);
+      input.selectionEnd = input.selectionStart = cursorPos + text.length;
       evaluate();
     }
     for (const button of document.getElementsByClassName("button")) {
       button.addEventListener("click", insertbuttontext);
     }
-    bracketButton.addEventListener("click", e => {
-      if (bracketButton.innerText=='('||bracketbalance(input.value) > 0) insertbuttontext(e);
-    })
     clearOneChar.addEventListener("click", (e) => {
       if (input.selectionEnd > 0) {
-        const cursorPos = input.selectionStart - 1;
-        input.value =
-          input.value.slice(0, cursorPos) +
-          input.value.slice(input.selectionEnd);
-        input.selectionEnd = input.selectionStart = cursorPos;
+        const cursorPos = input.selectionStart - (input.selectionStart == input.selectionEnd)
+        input.value = input.value.slice(0, cursorPos) + input.value.slice(input.selectionEnd);
+        input.selectionStart = input.selectionEnd = cursorPos;
         evaluate();
       }
     });
     clearAll.addEventListener("click", (e) => {
-      resultField.innerHTML = '&nbsp;';
-      input.value = '';
-      evaluate()
+      resultField.innerText = input.value = ''
+      bracketButton.innerText = '('
     });
     cursorMoveLeft.addEventListener("click", (e) => {
       input.selectionStart--;
       input.selectionEnd--;
+      updBraBu()
     });
     cursorMoveRight.addEventListener("click", (e) => {
       input.selectionEnd++;
       input.selectionStart++;
+      updBraBu()
     });
     enterButton.addEventListener("click", e => {
       evaluate()
       localStorage.setItem('invalue', input.value)
     })
+    document.onvisibilitychange = e => {
+      if (document.visibilityState == 'hidden') {
+        localStorage.setItem("invalue", input.value)
+      }
+    }
     input.addEventListener("input", evaluate);
     input.addEventListener("blur", (e) => setTimeout(input.focus(), 20));
     if ("serviceWorker" in navigator) {
